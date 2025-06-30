@@ -3,6 +3,7 @@ package org.acme.service
 import io.quarkus.arc.Unremovable
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
+import org.acme.dto.ProductFilter
 import org.acme.dto.Status
 import org.acme.model.Products
 import org.acme.repo.ProductRepository
@@ -35,6 +36,9 @@ class ProductService(val productRepository: ProductRepository) {
         var dbProducts=getByUuid(uuid)
         if(dbProducts==null)return Status(400,"Product Not FOund")
         dbProducts.deleted=true
-        return Status(200,"User Deleted Sucessfully")
+        return Status(200,"Product Deleted Sucessfully")
+    }
+    fun filterProducts(filter: ProductFilter): List<Products>{
+        return productRepository.filter(filter)
     }
 }

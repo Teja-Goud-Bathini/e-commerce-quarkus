@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.EntityManager
 import jakarta.persistence.NoResultException
 import jakarta.persistence.PersistenceContext
+import org.acme.dto.ProductFilter
 import org.acme.dto.Status
 import org.acme.model.Products
 import org.acme.model.User
@@ -33,4 +34,30 @@ class ProductRepositoryImpl(@PersistenceContext val entityManager: EntityManager
         }
 
     }
+    override fun filter(filter: ProductFilter): List<Products> {
+        val baseQuery = StringBuilder("SELECT * FROM products WHERE deleted = 0")
+
+        if (!filter.name.isNullOrBlank()) {
+            baseQuery.append(" AND LOWER(name) LIKE LOWER('%${filter.name}%')")
+        }
+        if (!filter.brand.isNullOrBlank()) {
+            baseQuery.append(" AND LOWER(brand) LIKE LOWER('%${filter.brand}%')")
+        }
+        if (!filter.category.isNullOrBlank()) {
+            baseQuery.append(" AND LOWER(category) LIKE LOWER('%${filter.category}%')")
+        }
+        if (!filter.code.isNullOrBlank()) {
+            baseQuery.append(" AND LOWER(code) LIKE LOWER('%${filter.code}%')")
+        }
+        if (filter.priceMin != null) {
+            baseQuery.append(" AND price >= ${filter.priceMin}")
+        }
+        if (filter.priceMax != null) {
+            baseQuery.append(" AND price <= ${filter.priceMax}")
+        }
+
+        return entityManager.createNativeQuery(baseQuery.toString(), Products::class.java)
+            .resultList as List<Products>
+    }
+
 }

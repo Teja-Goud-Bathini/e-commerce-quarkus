@@ -9,6 +9,8 @@ import jakarta.ws.rs.PUT
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.Produces
+import jakarta.ws.rs.QueryParam
+import org.acme.dto.ProductFilter
 import org.acme.dto.Status
 import org.acme.model.Products
 import org.acme.model.User
@@ -47,4 +49,26 @@ class ProductResource(val productService: ProductService) {
     fun deleteProduct(@PathParam("uuid")uuid: String):Status{
         return productService.deleteProduct(uuid)
     }
+
+    @GET
+    @Path("/filter")
+    fun filterProducts(
+        @QueryParam("name") name: String?,
+        @QueryParam("brand") brand: String?,
+        @QueryParam("category") category: String?,
+        @QueryParam("code") code: String?,
+        @QueryParam("priceMin") priceMin: Double?,
+        @QueryParam("priceMax") priceMax: Double?
+    ): List<Products> {
+        val filter = ProductFilter(
+            name = name,
+            brand = brand,
+            category = category,
+            code = code,
+            priceMin = priceMin,
+            priceMax = priceMax
+        )
+        return productService.filterProducts(filter)
+    }
+
 }
